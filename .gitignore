@@ -1,0 +1,5 @@
+# Mengabaikan folder bin
+SportEvent/bin/
+
+# Mengabaikan folder obj
+SportEvent/obj/
