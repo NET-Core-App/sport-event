@@ -1,0 +1,94 @@
+﻿@model IEnumerable<SportEvent.Models.Organizer>
+
+@{
+    ViewData["Title"] = "Organizer";
+
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+    int perPage = ViewBag.ItemsPerPage;
+    var displayedPages = new List<int>();
+
+    for (int i = currentPage; i <= currentPage + 10; i++)
+    {
+        if (i <= totalPages)
+        {
+            displayedPages.Add(i);
+        }
+    }
+}
+
+<h1>Organizer</h1>
+<div>
+    <a asp-action="Create">Create New</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Id
+            </th>
+            <th>
+                Organizer Name
+            </th>
+            <th>
+                Image Location
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.organizerName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.imageLocation)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (totalPages > 1)
+{
+    <ul class="pagination">
+        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+            <a class="page-link" href="@Url.Action("Index", "Organizer", new { page = 1, perPage = perPage })">First</a>
+        </li>
+
+        @if (currentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", "Organizer", new { page = currentPage - 1, perPage = perPage })">Previous</a>
+            </li>
+        }
+
+        @foreach (int x in displayedPages)
+        {
+            <li class="page-item @(x == currentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", "Organizer", new { page = x, perPage = perPage })">@x</a>
+            </li>
+        }
+
+        @if (currentPage < totalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", "Organizer", new { page = currentPage + 1, perPage = perPage })">Next</a>
+            </li>
+        }
+
+        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+            <a class="page-link" href="@Url.Action("Index", "Organizer", new { page = totalPages, perPage = perPage })">Last</a>
+        </li>
+    </ul>
+}
