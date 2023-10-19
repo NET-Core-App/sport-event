@@ -34,15 +34,15 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
 builder.Services.AddTransient<ISportEventRepository, SportEventRepository>();
 builder.Services.AddTransient<AuthorizationService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
 
-/*app.UseExceptionHandler(errorApp =>
+app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
@@ -52,7 +52,7 @@ if (!app.Environment.IsDevelopment())
         context.Response.Redirect("/Home/Error");
     });
 });
-*/
+
 
 app.UseStaticFiles();
 
@@ -69,10 +69,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
-    endpoints.MapControllerRoute(
-        name: "organizer",
-        pattern: "organizer/{page}/{perPage}",
-        defaults: new { controller = "Organizer", action = "Index" });
 });
 
 app.Run();

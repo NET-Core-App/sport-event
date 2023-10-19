@@ -66,6 +66,10 @@ namespace SportEvent.Controllers
             try
             {
                 var data = await _sportEventRepository.Detail(id, _apiClient);
+           /*     if(data == null)
+                {
+                    return RedirectToAction("Error", "Shared");
+                }*/
                 return View(data);
             }
             catch
