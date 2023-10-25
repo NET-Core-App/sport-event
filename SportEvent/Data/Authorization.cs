@@ -22,11 +22,8 @@ namespace SportEvent.Data
         {
             string accessToken = _httpContextAccessor.HttpContext.Session.GetString("AccessToken");
 
-            // Check if the access token is null or empty
             if (string.IsNullOrEmpty(accessToken))
             {
-                // You might want to log a message or handle the situation accordingly.
-                // Returning null or an empty string is an option.
                 return null;
             }
 
@@ -49,8 +46,7 @@ namespace SportEvent.Data
                 return false;
             }
 
-            // Set the BaseAddress and Authorization header if needed
-            _apiClient.BaseAddress = new Uri(_configure); // Assuming _configure is properly defined
+            _apiClient.BaseAddress = new Uri(_configure);
             _apiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             return true;

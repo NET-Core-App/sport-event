@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SportEvent.Data;
 using SportEvent.Data.Implementations;
 using SportEvent.Data.Interfaces;
@@ -12,13 +14,15 @@ namespace SportEvent.Controllers
     public class SportEventController : Controller
     {
         private readonly ISportEventRepository _sportEventRepository;
+        private readonly IOrganizerRepository _organizerRepository;
         private readonly ILogger<SportEventController> _logger;
         private readonly AuthorizationService _authorization;
         private readonly HttpClient _apiClient;
 
-        public SportEventController(ISportEventRepository sportEventRepository, ILogger<SportEventController> logger, AuthorizationService authorization)
+        public SportEventController(ISportEventRepository sportEventRepository, IOrganizerRepository organizerRepository, ILogger<SportEventController> logger, AuthorizationService authorization)
         {
             _sportEventRepository = sportEventRepository;
+            _organizerRepository = organizerRepository;
             _logger = logger;
             _authorization = authorization;
             _apiClient = new HttpClient();
@@ -93,10 +97,12 @@ namespace SportEvent.Controllers
             }
             try
             {
+                var organizers = await _organizerRepository.GetAllOrganizers(_apiClient, 1, 10);
+                ViewBag.Organizers = new SelectList((System.Collections.IEnumerable)organizers, "id", "organizerName");
+
                 if (ModelState.IsValid)
                 {
                     var registrationSuccess = await _sportEventRepository.Create(model, _apiClient);
-
                     if (registrationSuccess)
                     {
                         return RedirectToAction("Index", "SportEvent");
