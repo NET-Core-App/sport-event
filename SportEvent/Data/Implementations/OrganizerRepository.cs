@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using SportEvent.Data.Interfaces;
 using SportEvent.Models;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -17,8 +18,7 @@ namespace SportEvent.Data.Implementations
         {
             try
             {
-                using var httpClient = new HttpClient();
-
+             
                 StringContent content = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
                 using var response = await _apiClient.PostAsync("organizers", content);
@@ -29,17 +29,14 @@ namespace SportEvent.Data.Implementations
                 }
                 else
                 {
-                    /*       var content = await response.Content.ReadAsStringAsync();*/
-                    // Handle error response, log it, or throw an exception based on your application's logic
-                    Console.WriteLine($"Error: {response.StatusCode}, {content}");
                     return false;
                 }
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
-            
+
         }
 
         public async Task<OrganizerResponse> GetAllOrganizers(HttpClient _apiClient, int page, int perPage )
@@ -56,7 +53,7 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-                return null;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -73,17 +70,16 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-                // Handle HTTP request exceptions (e.g., network issues)
-                // Log the exception or return null based on your application's logic
-                return null;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
-        public async Task<bool> EditOrganizer(int id, Organizer data, HttpClient _apiClient)
+        public async Task<bool> EditOrganizer(int id, Organizer model, HttpClient _apiClient)
         {
             try
             {
-                using var response = await _apiClient.PutAsync($"organizers/{id}", new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"));
+                StringContent data = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                using var response = await _apiClient.PutAsync($"organizers/{id}", data);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -97,11 +93,9 @@ namespace SportEvent.Data.Implementations
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                // Handle exceptions, log them, or throw a custom exception based on your application's logic
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -119,7 +113,7 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
 
             return false;

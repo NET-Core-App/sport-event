@@ -7,6 +7,7 @@ using SportEvent.Data.Implementations;
 using SportEvent.Data.Interfaces;
 using SportEvent.Models;
 using System.Net;
+using System.Reflection;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SportEvent.Controllers
@@ -69,12 +70,17 @@ namespace SportEvent.Controllers
             }
             try
             {
-                var data = await _sportEventRepository.Detail(id, _apiClient);
-           /*     if(data == null)
+                if (ModelState.IsValid)
                 {
-                    return RedirectToAction("Error", "Shared");
-                }*/
-                return View(data);
+                    var data = await _sportEventRepository.Detail(id, _apiClient);
+                    return View(data);
+                }
+                else
+                {
+                    var errorMessage = "Failed to Get Detail Sport Event.";
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    return View();
+                }
             }
             catch
             {
@@ -97,9 +103,6 @@ namespace SportEvent.Controllers
             }
             try
             {
-                var organizers = await _organizerRepository.GetAllOrganizers(_apiClient, 1, 10);
-                ViewBag.Organizers = new SelectList((System.Collections.IEnumerable)organizers, "id", "organizerName");
-
                 if (ModelState.IsValid)
                 {
                     var registrationSuccess = await _sportEventRepository.Create(model, _apiClient);
@@ -111,11 +114,13 @@ namespace SportEvent.Controllers
                     {
                         var errorMessage = "Failed to register Sport Event.";
                         ModelState.AddModelError(string.Empty, errorMessage);
-                        return View(model);
+                        return View();
                     }
                 }
-
-                return View();
+                else
+                {
+                    return View();
+                }
             }
             catch
             {
@@ -153,14 +158,23 @@ namespace SportEvent.Controllers
             }
             try
             {
-                var updatedOrganizer = await _sportEventRepository.Edit(id, data, _apiClient);
-
-                if (updatedOrganizer == false)
+                if (ModelState.IsValid)
                 {
-                    return View(data);
-                }
+                    var updatedOrganizer = await _sportEventRepository.Edit(id, data, _apiClient);
 
-                return RedirectToAction("Index", "SportEvent");
+                    if (updatedOrganizer == false)
+                    {
+                        return View(data);
+                    }
+                    return RedirectToAction("Index", "SportEvent");
+
+                }
+                else
+                {
+                    var errorMessage = "Failed to Edit Sport Event.";
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                    return View();
+                }
             }
             catch (HttpRequestException ex)
             {

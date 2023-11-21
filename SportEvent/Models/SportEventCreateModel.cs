@@ -20,7 +20,5 @@ namespace SportEvent.Models
         [Required(ErrorMessage = "The organizer ID field is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Please select a valid organizerId.")]
         public int organizerId { get; set; }
-
-        public List<Organizer> Organizers { get; set; }
     }
 }

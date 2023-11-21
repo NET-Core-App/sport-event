@@ -1,5 +1,4 @@
-﻿@using SportEvent.Models 
-@model SportEvent.Models.SportEventCreateModel
+﻿@model SportEvent.Models.SportEventCreateModel
 @{
     ViewData["Title"] = "Create";
 }
@@ -22,7 +21,7 @@
                 <span asp-validation-for="eventType" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="eventName" class="control-label">Event NAme<span class="text-danger">*</span></label>
+                <label asp-for="eventName" class="control-label">Event Name<span class="text-danger">*</span></label>
                 <input asp-for="eventName" class="form-control" />
                 <span asp-validation-for="eventName" class="text-danger"></span>
             </div>
@@ -36,6 +35,7 @@
                 @Html.DropDownListFor(model => model.organizerId, new SelectList(ViewBag.Organizers, "id", "organizerName"), "Select Organizer", new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.organizerId, "", new { @class = "text-danger" })
             </div>*@
+          @*  @Html.DropDownList("Organizers", (SelectList)org, "Select an organizer")*@
 
             <div class="form-group mt-2">
                 <input type="submit" value="Create" class="btn btn-primary" />

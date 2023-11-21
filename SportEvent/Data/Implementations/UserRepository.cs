@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using SportEvent.Data.Interfaces;
 using SportEvent.Models;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -50,9 +51,9 @@ namespace SportEvent.Data.Implementations
 
                 return false;
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                throw;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -61,30 +62,8 @@ namespace SportEvent.Data.Implementations
             try
             {
                 int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
+
                 using var response = await apiClient.DeleteAsync($"users/{userId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                // Handle HTTP request exceptions (e.g., network issues)
-                // Log the exception or handle it based on your application's logic
-                return false;
-            }
-
-            return false;
-        }
-
-        public async Task<bool> Edit(UserModel data, HttpClient apiClient)
-        {
-            try
-            {
-                int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
-
-                using var response = await apiClient.PutAsync($"users/{userId}", new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -92,17 +71,38 @@ namespace SportEvent.Data.Implementations
                 }
                 else
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    // Handle error response, log it, or throw an exception based on your application's logic
-                    Console.WriteLine($"Error: {response.StatusCode}, {content}");
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                // Handle exceptions, log them, or throw a custom exception based on your application's logic
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
+            }
+
+        }
+
+        public async Task<bool> Edit(UserModel model, HttpClient apiClient)
+        {
+            try
+            {
+                StringContent content = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+                int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
+
+                using var response = await apiClient.PutAsync($"users/{userId}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -111,7 +111,9 @@ namespace SportEvent.Data.Implementations
             try
             {
                 int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
+
                 using var response = await apiClient.GetAsync($"users/{userId}");
+
                 response.EnsureSuccessStatusCode(); // Throw an exception for non-success status codes
 
                 var responseData = await response.Content.ReadAsStringAsync();
@@ -120,9 +122,7 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-                // Handle HTTP request exceptions (e.g., network issues)
-                // Log the exception or return null based on your application's logic
-                return null;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -130,8 +130,7 @@ namespace SportEvent.Data.Implementations
         {
             try
             {
-                using var httpClient = new HttpClient();
-                StringContent content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                StringContent content = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
                 using var response = await _apiClient.PostAsync("users", content);
                 if (response.IsSuccessStatusCode)
@@ -140,24 +139,23 @@ namespace SportEvent.Data.Implementations
                 }
                 else
                 {
-                    /*       var content = await response.Content.ReadAsStringAsync();*/
-                    // Handle error response, log it, or throw an exception based on your application's logic
-                    Console.WriteLine($"Error: {response.StatusCode}, {content}");
                     return false;
                 }
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
-        public async Task<bool> ChangePassword(ChangePassword data, HttpClient apiClient)
+        public async Task<bool> ChangePassword(ChangePassword model, HttpClient apiClient)
         {
             try
             {
+                StringContent content = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
                 int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
 
-                using var response = await apiClient.PutAsync($"users/{userId}/password", new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"));
+                using var response = await apiClient.PutAsync($"users/{userId}/password", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -165,17 +163,12 @@ namespace SportEvent.Data.Implementations
                 }
                 else
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    // Handle error response, log it, or throw an exception based on your application's logic
-                    Console.WriteLine($"Error: {response.StatusCode}, {content}");
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                // Handle exceptions, log them, or throw a custom exception based on your application's logic
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 /*

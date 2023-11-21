@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SportEvent.Data.Interfaces;
 using SportEvent.Models;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 
 namespace SportEvent.Data.Implementations
@@ -14,8 +14,6 @@ namespace SportEvent.Data.Implementations
         {
             try
             {
-                using var httpClient = new HttpClient();
-
                 StringContent content = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
                 using var response = await _apiClient.PostAsync("sport-events", content);
@@ -29,9 +27,9 @@ namespace SportEvent.Data.Implementations
                     return false;
                 }
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -46,20 +44,24 @@ namespace SportEvent.Data.Implementations
                 {
                     return true;
                 }
+                else
+                {
+                    return false;
+                }
             }
             catch (HttpRequestException ex)
             {
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
-
-            return false;
         }
 
-        public async Task<bool> Edit(int id, SportEventCreateModel data, HttpClient _apiClient)
+        public async Task<bool> Edit(int id, SportEventCreateModel model, HttpClient _apiClient)
         {
             try
             {
-                using var response = await _apiClient.PutAsync($"sport-events/{id}", new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"));
+                StringContent content = new(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+                using var response = await _apiClient.PutAsync($"sport-events/{id}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -67,15 +69,12 @@ namespace SportEvent.Data.Implementations
                 }
                 else
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error: {response.StatusCode}, {content}");
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -93,8 +92,7 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-
-                return null;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -111,7 +109,7 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-                return null;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
 
@@ -129,7 +127,7 @@ namespace SportEvent.Data.Implementations
             }
             catch (HttpRequestException ex)
             {
-                return null;
+                throw new HttpRequestException("Error occurred while making the HTTP request.", ex);
             }
         }
     }

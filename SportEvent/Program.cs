@@ -19,12 +19,12 @@ var builder = WebApplication.CreateBuilder(args);
 *//*    .MinimumLevel.Information()*//*
     .CreateLogger();
 */
-var jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logger.json");
+/*var jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logger.json");
 var logEvents = new List<LogEvent>();
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Sink(new CollectionSink(logEvents, jsonFilePath))
     .CreateLogger();
-
+*/
 
 // Add services to the container.
 builder.Services.AddSerilog();
